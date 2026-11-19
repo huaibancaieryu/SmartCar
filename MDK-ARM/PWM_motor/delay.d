@@ -1,0 +1,10 @@
+pwm_motor\delay.o: ..\Core\Src\Delay.c
+pwm_motor\delay.o: C:\Users\86136\AppData\Local\Arm\Packs\Keil\STM32F1xx_DFP\2.4.1\Device\Include\stm32f10x.h
+pwm_motor\delay.o: .\RTE\_PWM_motor\RTE_Components.h
+pwm_motor\delay.o: ../Drivers/CMSIS/Include/core_cm3.h
+pwm_motor\delay.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
+pwm_motor\delay.o: ../Drivers/CMSIS/Include/cmsis_version.h
+pwm_motor\delay.o: ../Drivers/CMSIS/Include/cmsis_compiler.h
+pwm_motor\delay.o: ../Drivers/CMSIS/Include/cmsis_armcc.h
+pwm_motor\delay.o: C:\Users\86136\AppData\Local\Arm\Packs\Keil\STM32F1xx_DFP\2.4.1\Device\Include\system_stm32f10x.h
+pwm_motor\delay.o: ../Core/Inc/Delay.h

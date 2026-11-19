@@ -27,5 +27,8 @@ pwm_motor\main.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash_ex.h
 pwm_motor\main.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pwr.h
 pwm_motor\main.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim.h
 pwm_motor\main.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim_ex.h
+pwm_motor\main.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_uart.h
 pwm_motor\main.o: ../Core/Inc/tim.h
+pwm_motor\main.o: ../Core/Inc/usart.h
 pwm_motor\main.o: ../Core/Inc/gpio.h
+pwm_motor\main.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h

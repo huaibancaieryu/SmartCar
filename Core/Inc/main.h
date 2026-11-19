@@ -58,18 +58,30 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
-#define PWMA_Pin GPIO_PIN_2
-#define PWMA_GPIO_Port GPIOA
-#define PWMB_Pin GPIO_PIN_3
-#define PWMB_GPIO_Port GPIOA
-#define AIN2_Pin GPIO_PIN_4
-#define AIN2_GPIO_Port GPIOA
-#define AIN1_Pin GPIO_PIN_5
-#define AIN1_GPIO_Port GPIOA
-#define BIN1_Pin GPIO_PIN_6
-#define BIN1_GPIO_Port GPIOA
-#define BIN2_Pin GPIO_PIN_7
-#define BIN2_GPIO_Port GPIOA
+#define TB6612_1_PWMA_Pin GPIO_PIN_2
+#define TB6612_1_PWMA_GPIO_Port GPIOA
+#define _1_PWMA_Pin GPIO_PIN_3
+#define _1_PWMA_GPIO_Port GPIOA
+#define _1_AIN2_Pin GPIO_PIN_4
+#define _1_AIN2_GPIO_Port GPIOA
+#define _1_AIN1_Pin GPIO_PIN_5
+#define _1_AIN1_GPIO_Port GPIOA
+#define _1_BIN1_Pin GPIO_PIN_6
+#define _1_BIN1_GPIO_Port GPIOA
+#define _1_BIN2_Pin GPIO_PIN_7
+#define _1_BIN2_GPIO_Port GPIOA
+#define _2_PWMA_Pin GPIO_PIN_0
+#define _2_PWMA_GPIO_Port GPIOB
+#define _2_PWMB_Pin GPIO_PIN_1
+#define _2_PWMB_GPIO_Port GPIOB
+#define _2_AIN1_Pin GPIO_PIN_4
+#define _2_AIN1_GPIO_Port GPIOB
+#define _2_AIN2_Pin GPIO_PIN_5
+#define _2_AIN2_GPIO_Port GPIOB
+#define _2_BIN1_Pin GPIO_PIN_6
+#define _2_BIN1_GPIO_Port GPIOB
+#define _2_BIN2_Pin GPIO_PIN_7
+#define _2_BIN2_GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */
