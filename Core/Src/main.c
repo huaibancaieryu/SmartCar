@@ -35,6 +35,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+#define NOTRECEIVE 2000    // 2秒没收到任何字节,就自动停车
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -49,6 +50,8 @@
 
 uint8_t RxData = 0x00;          // 接收缓冲区：存1个字节
 
+static volatile uint32_t lastCmdTick = 0;//上次命令时间戳
+static volatile uint8_t carMoving = 0;//小车运动状态：1（动），0（停）
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -60,8 +63,8 @@ void SystemClock_Config(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
-//_1电机A
-void SetSpeedA(int8_t Speed)//有符号 8 位整数,可表示-128 ~ 127，所以SetSpeedA() 可以传正数、负数
+//_1电机A，左前轮
+void SetSpeedA(int16_t Speed)//有符号16位整数,所以SetSpeedA() 可以传正数、负数
 {
 	// Speed > 0 ：电机A正转
 // Speed < 0 ：电机A反转
@@ -90,8 +93,8 @@ void SetSpeedA(int8_t Speed)//有符号 8 位整数,可表示-128 ~ 127，所以
 	}
 }
 
-//_1电机B
-void SetSpeedB(int8_t Speed)
+//_1电机B，左后轮
+void SetSpeedB(int16_t Speed)
 {
     if(Speed >= 0) {
         HAL_GPIO_WritePin(GPIOA, GPIO_PIN_6, GPIO_PIN_SET);   // BIN1=H
@@ -105,8 +108,8 @@ void SetSpeedB(int8_t Speed)
 }
 
 
-//_2电机C
-void SetSpeedC(int8_t Speed)
+//_2电机C，右前轮
+void SetSpeedC(int16_t Speed)
 {
 	if(Speed>=0)
 	{
@@ -131,8 +134,8 @@ void SetSpeedC(int8_t Speed)
 	}
 }
 
-//_2电机D
-void SetSpeedD(int8_t Speed)
+//_2电机D，右后轮
+void SetSpeedD(int16_t Speed)
 {
     if(Speed >= 0) {
         HAL_GPIO_WritePin(GPIOB, GPIO_PIN_6, GPIO_PIN_SET);   
@@ -146,36 +149,117 @@ void SetSpeedD(int8_t Speed)
     }
 }
 
-void Advance(void) //小车前进
+void Advance_SlowSpeed(void) //慢速前进（停车微调、颠簸路段）
 {
-    SetSpeedA(30);
-    SetSpeedB(30);
-    SetSpeedC(30);
-    SetSpeedD(30);
+    SetSpeedA(28);
+    SetSpeedB(28);
+    SetSpeedC(28);
+    SetSpeedD(28);
+	
+	  carMoving = 1;
 }
 
-void Recoil(void) //小车后退
+void Advance_MediumSpeed(void) //中速前进(平路)
+{
+    SetSpeedA(60);
+    SetSpeedB(60);
+    SetSpeedC(60);
+    SetSpeedD(60);
+	
+	  carMoving = 1;
+}
+
+void Advance_HighSpeed(void) //高速前进(平路)
+{
+    SetSpeedA(85);
+    SetSpeedB(85);
+    SetSpeedC(85);
+    SetSpeedD(85);
+	
+	  carMoving = 1;
+}
+
+void Advance_FullSpeed(void) //全速前进（爬坡）
+{
+    SetSpeedA(99);
+    SetSpeedB(99);
+    SetSpeedC(99);
+    SetSpeedD(99);
+	
+	  carMoving = 1;
+}
+
+
+void Recoil_SlowSpeed(void) //慢速后退（停车微调）
+{
+    SetSpeedA(-28);
+    SetSpeedB(-28);
+    SetSpeedC(-28);
+    SetSpeedD(-28);
+	
+	  carMoving = 1;
+}
+
+
+
+void Left_differential(void) //向左转S弯//内侧（左前轮、左后轮）25，外侧40
+{
+    SetSpeedA(25);
+    SetSpeedB(25);
+    SetSpeedC(40);
+    SetSpeedD(40);
+	
+	  carMoving = 1;
+}
+
+void Left_InPlace(void) //原地左转（停车微调）
 {
     SetSpeedA(-30);
     SetSpeedB(-30);
-    SetSpeedC(-30);
-    SetSpeedD(-30);
-}
-
-void Left_turn(void) //小车左转
-{
-    SetSpeedA(-30);
-    SetSpeedB(-30);
     SetSpeedC(30);
     SetSpeedD(30);
+	
+	  carMoving = 1;
 }
 
-void Right_turn(void) //小车右转
+void Left_Turn(void) //正常左转
+{
+    SetSpeedA(30);
+    SetSpeedB(30);
+    SetSpeedC(40);
+    SetSpeedD(40);
+	
+	  carMoving = 1;
+}
+
+void Right_differential(void) //向右转S弯//内侧25，外侧40
+{
+    SetSpeedA(40);
+    SetSpeedB(40);
+    SetSpeedC(25);
+    SetSpeedD(25);
+	
+	  carMoving = 1;
+}
+
+void Right_InPlace(void) //原地右转（停车微调）
 {
     SetSpeedA(30);
     SetSpeedB(30);
     SetSpeedC(-30);
     SetSpeedD(-30);
+	
+	  carMoving = 1;
+}
+
+void Right_Turn(void) //正常右转
+{
+    SetSpeedA(40);
+    SetSpeedB(40);
+    SetSpeedC(30);
+    SetSpeedD(30);
+	
+	  carMoving = 1;
 }
 
 void Stop(void) //小车停止
@@ -184,6 +268,8 @@ void Stop(void) //小车停止
     SetSpeedB(0);
     SetSpeedC(0);
     SetSpeedD(0);
+	
+	  carMoving = 0;
 }
 
 /* USER CODE END 0 */
@@ -204,7 +290,7 @@ int main(void)
   HAL_Init();
 
   /* USER CODE BEGIN Init */
-
+lastCmdTick = HAL_GetTick();//初始化，获取命令时间戳
   /* USER CODE END Init */
 
   /* Configure the system clock */
@@ -278,6 +364,11 @@ int main(void)
 
   while (1)
   {
+		// 失控保护，防止蓝牙断连后小车仍在运动
+    if (carMoving && (HAL_GetTick() - lastCmdTick > NOTRECEIVE))
+    {
+        Stop();
+    }
 //	if(HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_1) == GPIO_PIN_RESET)
 //	{
 //		//��������
@@ -294,7 +385,7 @@ int main(void)
 //	HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);
 //  HAL_Delay(500);
 		
-	HAL_Delay(100);
+//	HAL_Delay(100);
 //	OLED_ShowSignedNum(1, 7, Speed*50, 6);
     /* USER CODE END WHILE */
 
@@ -347,19 +438,35 @@ void SystemClock_Config(void)
 {
     if (huart->Instance == USART1)
     {
+			
 			// 调试：把收到的原始字节发回手机APP，看看到底是什么值
-        HAL_UART_Transmit(&huart1,&RxData,1,100);
+//        HAL_UART_Transmit(&huart1,&RxData,1,100);
+			
         // RxData 就是蓝牙发来的那个字节
         // 比如：0x01=前进, 0x02=后退, 0x03=左转...
         
+			  lastCmdTick = HAL_GetTick();//获取命令时间戳
+			
         switch (RxData)
         {
-            case 0x01: Advance();break;
-            case 0x02: Recoil();break;
-            case 0x03: Left_turn();break;
-            case 0x04: Right_turn();break;
+            case 0x01: Advance_SlowSpeed();break;
+					  case 0x02: Advance_MediumSpeed();break;
+					  case 0x03: Advance_HighSpeed();break;
+					  case 0x04: Advance_FullSpeed();break;
+					
             case 0x05: Stop();break;
-            default:   Stop();break;
+					
+					  case 0x06: Recoil_SlowSpeed();break;
+					
+					  case 0x07: Left_differential();break;
+					  case 0x08: Left_InPlace();break;
+					  case 0x09: Left_Turn();break;
+					  
+					  case 0x0A: Right_differential();break;
+					  case 0x0B: Right_InPlace();break;
+					  case 0x0C: Right_Turn();break;
+					
+            default:break;
         }
 
         // 重新开启下一次接收（必须加！否则只能收一次）

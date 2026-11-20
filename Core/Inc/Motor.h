@@ -5,10 +5,36 @@
 
 void Motor_Init(void);
 
-void Advance(void);
-void Recoil(void);
-void Left_turn(void);
-void Right_turn(void);
+
+void Advance_SlowSpeed(void);
+
+void Advance_MediumSpeed(void);
+
+void Advance_HighSpeed(void);
+
+void Advance_FullSpeed(void);
+
+
+
+void Recoil_SlowSpeed(void);
+
+
+
+void Left_differential(void);
+
+void Left_InPlace(void);
+
+void Left_Turn(void);
+
+
+void Right_differential(void);
+
+void Right_InPlace(void);
+
+void Right_Turn(void);
+
+
+
 void Stop(void);
 
 
